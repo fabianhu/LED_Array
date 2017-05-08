@@ -72,6 +72,7 @@ void writeText(char* text, uint8_t r, uint8_t g, uint8_t b);
 
 /* USER CODE BEGIN 0 */
 
+
 #include "fonts/homespun_font.h"
 #define FONTWIDTH 7
 #define FONTOFFSET 32
@@ -84,7 +85,7 @@ void writeText(char* text, uint8_t r, uint8_t g, uint8_t b)
 	do
 	{
 		x += writeChar(*ptr, x, r, g, b);
-		x++ // spacing between chars
+		x++; // spacing between chars
 		ptr++;
 	}
 	while( *ptr !=0);
@@ -99,22 +100,23 @@ int writeChar(char c, uint8_t x, uint8_t r, uint8_t g, uint8_t b)
 	int n = 0;
 	for (int i = 0; i < FONTWIDTH; i++)
 	{
+		uint8_t xi = x+i;
 		uint8_t col = font[idx][i];
-		if( col != 0)
-			n =i; // increment n for every used column to determine width of letter
-		for (int j = 0; j < 8; j++)
-		{
-			if(col & (0x01 << j)) // down is left
-				setPixel(x+1,j,r,g,b);
-				//setPixel(x+1,8-j,r,g,b); // upside down
-			else
-				setPixel(x+1,j,0,0,0);
-				//setPixel(x+1,8-j,0,0,0)
 
+		if( col != 0)
+		{
+			n ++; // increment n for every used column to determine width of letter
+
+			for (int j = 0; j < 8; j++)
+			{
+				if(col & (0x01 << j)) // down is left
+					//setPixel(x+i,j,r,g,b);
+					setPixel(xi,7-j,r,g,b); // upside down
+			}
 		}
 	}
 
-	return x+n;
+	return n;
 }
 
 
@@ -126,7 +128,7 @@ void setPixel(uint8_t x, uint8_t y, uint8_t r, uint8_t g, uint8_t b)
 	frameBuffer[y][x*3+2] = b;
 }
 
-void setBuffer(uint8_t r, uint8_t g, uint8_t b)
+void setLBuffer(uint8_t r, uint8_t g, uint8_t b)
 {
 	uint8_t* ptr = &frameBuffer[0][0];
 	for (int i=0; i < sizeof (frameBuffer); i+=3)
@@ -136,6 +138,24 @@ void setBuffer(uint8_t r, uint8_t g, uint8_t b)
 		ptr[i+2] = b;
 	}
 }
+
+void clearArr(void)
+{
+	setLBuffer(0,0,0);
+}
+
+
+void setBlk(uint8_t x, uint8_t l, uint8_t r, uint8_t g, uint8_t b)
+{
+	for (int i=x; i < (x+l); i++)
+	{
+		for (int y=0; y < 8; y++)
+			{
+				setPixel(i,y,r,g,b);
+			}
+	}
+}
+
 
 
 void visHandle()
@@ -198,25 +218,51 @@ int main(void)
 
   visInit();
 
-  setBuffer(0,0,0);
+  setLBuffer(0,0,0);
   //setPixel(0,0,30,30,30);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 
-  int i = 0;
 
   while (1)
   {
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */
-	  setPixel(i,0,100,100,100);
-	  HAL_Delay(33);
+	  clearArr();
+	  writeText("Hi",255,0,0);
 	  if(do_it) visHandle();
-	  setPixel(i++,0,0,0,0);
-	  if (i>20) i=0;
+	  HAL_Delay(500);
+	  clearArr();
+	  writeText("Joerg",0,0,255);
+	  if(do_it) visHandle();
+	  HAL_Delay(500);
+
+	  for (int i =1; i< 32;i++)
+	  {
+		  setBlk(i-1,1,0,0,0);
+		  setBlk(i,1,100,0,0);
+		  visHandle();
+		  HAL_Delay(20);
+	  }
+	  for (int i =32; i>0;i--)
+	  {
+		  setBlk(i,1,0,0,0);
+		  setBlk(i+1,1,100,0,0);
+		  visHandle();
+		  HAL_Delay(20);
+	  }
+	  setLBuffer(100,0,0);
+	  visHandle();
+	  HAL_Delay(1500);
+	  setLBuffer(0,100,0);
+	  visHandle();
+	  HAL_Delay(1500);
+	  setLBuffer(0,0,100);
+	  visHandle();
+	  HAL_Delay(1500);
 
   }
   /* USER CODE END 3 */

@@ -373,10 +373,11 @@ static void ws2812b_set_pixel(uint8_t row, uint16_t column, uint8_t red, uint8_t
 {
 
 	// Apply gamma
+#if GAMMA
 	red = gammaTable[red];
 	green = gammaTable[green];
 	blue = gammaTable[blue];
-
+#endif
 
 	uint32_t calcCol = (column*24);
 	uint32_t invRed = ~red;
