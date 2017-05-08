@@ -61,12 +61,62 @@ uint8_t frameBuffer[8][3*WS2812B_NUMBER_OF_LEDS];
 void SystemClock_Config(void);
 void Error_Handler(void);
 
+void setPixel(uint8_t x, uint8_t y, uint8_t r, uint8_t g, uint8_t b);
+int writeChar(char c, uint8_t x, uint8_t r, uint8_t g, uint8_t b);
+void writeText(char* text, uint8_t r, uint8_t g, uint8_t b);
+
 /* USER CODE BEGIN PFP */
 /* Private function prototypes -----------------------------------------------*/
 
 /* USER CODE END PFP */
 
 /* USER CODE BEGIN 0 */
+
+#include "fonts/homespun_font.h"
+#define FONTWIDTH 7
+#define FONTOFFSET 32
+
+
+void writeText(char* text, uint8_t r, uint8_t g, uint8_t b)
+{
+	char* ptr = text;
+	int x = 0;
+	do
+	{
+		x += writeChar(*ptr, x, r, g, b);
+		x++ // spacing between chars
+		ptr++;
+	}
+	while( *ptr !=0);
+}
+
+// return x position
+int writeChar(char c, uint8_t x, uint8_t r, uint8_t g, uint8_t b)
+{
+	int idx = c-FONTOFFSET;
+	if (idx < 0)
+		return x;
+	int n = 0;
+	for (int i = 0; i < FONTWIDTH; i++)
+	{
+		uint8_t col = font[idx][i];
+		if( col != 0)
+			n =i; // increment n for every used column to determine width of letter
+		for (int j = 0; j < 8; j++)
+		{
+			if(col & (0x01 << j)) // down is left
+				setPixel(x+1,j,r,g,b);
+				//setPixel(x+1,8-j,r,g,b); // upside down
+			else
+				setPixel(x+1,j,0,0,0);
+				//setPixel(x+1,8-j,0,0,0)
+
+		}
+	}
+
+	return x+n;
+}
+
 
 
 void setPixel(uint8_t x, uint8_t y, uint8_t r, uint8_t g, uint8_t b)
