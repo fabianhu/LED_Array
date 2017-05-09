@@ -41,7 +41,7 @@
 
 /* USER CODE BEGIN Includes */
 
-#include "ws2812b/ws2812b.h"
+#include "led_array.h"
 
 /* USER CODE END Includes */
 
@@ -50,20 +50,12 @@
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
 
-// define array of Pixel-Data
-// RGB Frame buffers 8 buffers for 8 lines with 72 LEDs each.
-uint8_t frameBuffer[8][3*WS2812B_NUMBER_OF_LEDS];
-
 
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 void Error_Handler(void);
-
-void setPixel(uint8_t x, uint8_t y, uint8_t r, uint8_t g, uint8_t b);
-int writeChar(char c, uint8_t x, uint8_t r, uint8_t g, uint8_t b);
-void writeText(char* text, uint8_t r, uint8_t g, uint8_t b);
 
 /* USER CODE BEGIN PFP */
 /* Private function prototypes -----------------------------------------------*/
@@ -73,119 +65,6 @@ void writeText(char* text, uint8_t r, uint8_t g, uint8_t b);
 /* USER CODE BEGIN 0 */
 
 
-#include "fonts/homespun_font.h"
-#define FONTWIDTH 7
-#define FONTOFFSET 32
-
-
-void writeText(char* text, uint8_t r, uint8_t g, uint8_t b)
-{
-	char* ptr = text;
-	int x = 0;
-	do
-	{
-		x += writeChar(*ptr, x, r, g, b);
-		x++; // spacing between chars
-		ptr++;
-	}
-	while( *ptr !=0);
-}
-
-// return x position
-int writeChar(char c, uint8_t x, uint8_t r, uint8_t g, uint8_t b)
-{
-	int idx = c-FONTOFFSET;
-	if (idx < 0)
-		return x;
-	int n = 0;
-	for (int i = 0; i < FONTWIDTH; i++)
-	{
-		uint8_t xi = x+i;
-		uint8_t col = font[idx][i];
-
-		if( col != 0)
-		{
-			n ++; // increment n for every used column to determine width of letter
-
-			for (int j = 0; j < 8; j++)
-			{
-				if(col & (0x01 << j)) // down is left
-					//setPixel(x+i,j,r,g,b);
-					setPixel(xi,7-j,r,g,b); // upside down
-			}
-		}
-	}
-
-	return n;
-}
-
-
-
-void setPixel(uint8_t x, uint8_t y, uint8_t r, uint8_t g, uint8_t b)
-{
-	frameBuffer[y][x*3]   = r;
-	frameBuffer[y][x*3+1] = g;
-	frameBuffer[y][x*3+2] = b;
-}
-
-void setLBuffer(uint8_t r, uint8_t g, uint8_t b)
-{
-	uint8_t* ptr = &frameBuffer[0][0];
-	for (int i=0; i < sizeof (frameBuffer); i+=3)
-	{
-		ptr[i]   = r;
-		ptr[i+1] = g;
-		ptr[i+2] = b;
-	}
-}
-
-void clearArr(void)
-{
-	setLBuffer(0,0,0);
-}
-
-
-void setBlk(uint8_t x, uint8_t l, uint8_t r, uint8_t g, uint8_t b)
-{
-	for (int i=x; i < (x+l); i++)
-	{
-		for (int y=0; y < 8; y++)
-			{
-				setPixel(i,y,r,g,b);
-			}
-	}
-}
-
-
-
-void visHandle()
-{
-
-	if(ws2812b.transferComplete)
-	{
-		// Update your framebuffer here or swap buffers
-
-
-		// Signal that buffer is changed and transfer new data
-		ws2812b.startTransfer = 1;
-		ws2812b_handle();
-	}
-}
-
-void visInit()
-{
-	for(int i = 0; i< WS2812_BUFFER_COUNT; i++)
-	{
-		// Set output channel/pin, GPIO_PIN_0 = 0, for GPIO_PIN_5 = 5 - this has to correspond to WS2812B_PINS
-		ws2812b.item[i].channel = i;
-		// Your RGB frame buffer
-		ws2812b.item[i].frameBufferPointer = frameBuffer[i];
-		// RAW size of frame buffer
-		ws2812b.item[i].frameBufferSize = sizeof(frameBuffer[i]);
-	}
-
-	ws2812b_init();
-}
 
 
 volatile int32_t do_it = 1;
@@ -216,9 +95,9 @@ int main(void)
 
   /* USER CODE BEGIN 2 */
 
-  visInit();
+  LED_Init();
 
-  setLBuffer(0,0,0);
+  LED_fill(0,0,0);
   //setPixel(0,0,30,30,30);
   /* USER CODE END 2 */
 
@@ -231,38 +110,48 @@ int main(void)
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */
-	  clearArr();
-	  writeText("Hi",255,0,0);
-	  if(do_it) visHandle();
-	  HAL_Delay(500);
-	  clearArr();
-	  writeText("Joerg",0,0,255);
-	  if(do_it) visHandle();
+	  LED_clear();
+	  LED_writeText("Moep!",0,255,0,0);
+	  if(do_it) LED_start();
 	  HAL_Delay(500);
 
-	  for (int i =1; i< 32;i++)
-	  {
-		  setBlk(i-1,1,0,0,0);
-		  setBlk(i,1,100,0,0);
-		  visHandle();
-		  HAL_Delay(20);
-	  }
-	  for (int i =32; i>0;i--)
-	  {
-		  setBlk(i,1,0,0,0);
-		  setBlk(i+1,1,100,0,0);
-		  visHandle();
-		  HAL_Delay(20);
-	  }
-	  setLBuffer(100,0,0);
-	  visHandle();
-	  HAL_Delay(1500);
-	  setLBuffer(0,100,0);
-	  visHandle();
-	  HAL_Delay(1500);
-	  setLBuffer(0,0,100);
-	  visHandle();
-	  HAL_Delay(1500);
+	  LED_clear();
+	  LED_start();
+	  HAL_Delay(500);
+	  //runText("Franz jagt im komplett verwahrlosten Auto Quer durch Bayern.",255,0,0);
+	  char t[] = {'H','a','l','l','o',' ','J',96+31,'r','g','!'};
+	  LED_runText(t,255,0,0);
+	  HAL_Delay(500);
+	  LED_runText("ich glaub, die Laufschrift ist ganz brauchbar so.",255,0,0);
+	  HAL_Delay(500);
+//	  clearArr();
+//	  writeText("Joerg",0,0,255);
+//	  if(do_it) visHandle();
+//	  HAL_Delay(500);
+//
+//	  for (int i =1; i< 32;i++)
+//	  {
+//		  setBlk(i-1,1,0,0,0);
+//		  setBlk(i,1,100,0,0);
+//		  visHandle();
+//		  HAL_Delay(20);
+//	  }
+//	  for (int i =32; i>0;i--)
+//	  {
+//		  setBlk(i,1,0,0,0);
+//		  setBlk(i+1,1,100,0,0);
+//		  visHandle();
+//		  HAL_Delay(20);
+//	  }
+//	  setLBuffer(100,0,0);
+//	  visHandle();
+//	  HAL_Delay(500);
+//	  setLBuffer(0,100,0);
+//	  visHandle();
+//	  HAL_Delay(500);
+//	  setLBuffer(0,0,100);
+//	  visHandle();
+//	  HAL_Delay(500);
 
   }
   /* USER CODE END 3 */
