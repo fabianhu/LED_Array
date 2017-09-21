@@ -66,9 +66,6 @@ void Error_Handler(void);
 
 
 
-
-volatile int32_t do_it = 1;
-
 /* USER CODE END 0 */
 
 int main(void)
@@ -111,9 +108,9 @@ int main(void)
 
   /* USER CODE BEGIN 3 */
 	  LED_clear();
-	  LED_writeText("Moep!",0,255,0,0);
-	  if(do_it) LED_start();
-	  HAL_Delay(500);
+	  LED_writeText("Mööp!",0,255,0,0);
+	  LED_start();
+	  HAL_Delay(1000);
 
 	  LED_clear();
 	  LED_start();

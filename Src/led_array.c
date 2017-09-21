@@ -13,6 +13,28 @@
 #define FONTWIDTH 7
 #define FONTOFFSET 32
 
+typedef struct RgbColor
+{
+    uint8_t r;
+    uint8_t g;
+    uint8_t b;
+} RgbColor;
+
+typedef struct HsvColor
+{
+	uint8_t h;
+	uint8_t s;
+	uint8_t v;
+} HsvColor;
+
+RgbColor HsvToRgb(HsvColor hsv);
+HsvColor RgbToHsv(RgbColor rgb);
+
+
+uint8_t bk_r = 0;
+uint8_t bk_g = 0;
+uint8_t bk_b = 0;
+
 // define array of Pixel-Data
 // RGB Frame buffers 8 buffers for 8 lines with 72 LEDs each.
 uint8_t frameBuffer[8][3*WS2812B_NUMBER_OF_LEDS];
@@ -70,12 +92,12 @@ int LED_writeChar(char c, int x, uint8_t r, uint8_t g, uint8_t b)
 				//setPixel(x+i,j,r,g,b);
 				LED_setPixel(xi,7-j,r,g,b); // upside down
 			else
-				LED_setPixel(xi,7-j,10,10,10); // upside down
+				LED_setPixel(xi,7-j,bk_r,bk_g,bk_b); // upside down
 		}
 	}
 	for (int j = 0; j < 8; j++) // tailing space
 	{
-			LED_setPixel(x+n,7-j,0,20,0);
+			LED_setPixel(x+n,7-j,bk_r,bk_g,bk_b);
 	}
 	//visHandle();
 	//HAL_Delay(5);
@@ -88,6 +110,23 @@ void LED_setPixel(int x, int y, uint8_t r, uint8_t g, uint8_t b)
 {
 	if( x < 0 || x > WS2812B_NUMBER_OF_LEDS-1) return;
 	if( y < 0 || y > 7) return;
+
+	HsvColor hsv;
+	RgbColor rgb;
+
+	rgb.r = r;
+	rgb.g = g;
+	rgb.b = b;
+
+	hsv = RgbToHsv(rgb);
+	hsv.h = x*10;
+	rgb = HsvToRgb(hsv);
+
+	r= rgb.r;
+	g=rgb.g;
+	b=rgb.b;
+
+
 	frameBuffer[y][x*3]   = r;
 	frameBuffer[y][x*3+1] = g;
 	frameBuffer[y][x*3+2] = b;
@@ -150,4 +189,85 @@ void LED_Init()
 	}
 
 	ws2812b_init();
+}
+
+
+
+
+RgbColor HsvToRgb(HsvColor hsv)
+{
+    RgbColor rgb;
+    uint8_t region, remainder, p, q, t;
+
+    if (hsv.s == 0)
+    {
+        rgb.r = hsv.v;
+        rgb.g = hsv.v;
+        rgb.b = hsv.v;
+        return rgb;
+    }
+
+    region = hsv.h / 43;
+    remainder = (hsv.h - (region * 43)) * 6;
+
+    p = (hsv.v * (255 - hsv.s)) >> 8;
+    q = (hsv.v * (255 - ((hsv.s * remainder) >> 8))) >> 8;
+    t = (hsv.v * (255 - ((hsv.s * (255 - remainder)) >> 8))) >> 8;
+
+    switch (region)
+    {
+        case 0:
+            rgb.r = hsv.v; rgb.g = t; rgb.b = p;
+            break;
+        case 1:
+            rgb.r = q; rgb.g = hsv.v; rgb.b = p;
+            break;
+        case 2:
+            rgb.r = p; rgb.g = hsv.v; rgb.b = t;
+            break;
+        case 3:
+            rgb.r = p; rgb.g = q; rgb.b = hsv.v;
+            break;
+        case 4:
+            rgb.r = t; rgb.g = p; rgb.b = hsv.v;
+            break;
+        default:
+            rgb.r = hsv.v; rgb.g = p; rgb.b = q;
+            break;
+    }
+
+    return rgb;
+}
+
+HsvColor RgbToHsv(RgbColor rgb)
+{
+    HsvColor hsv;
+    uint8_t rgbMin, rgbMax;
+
+    rgbMin = rgb.r < rgb.g ? (rgb.r < rgb.b ? rgb.r : rgb.b) : (rgb.g < rgb.b ? rgb.g : rgb.b);
+    rgbMax = rgb.r > rgb.g ? (rgb.r > rgb.b ? rgb.r : rgb.b) : (rgb.g > rgb.b ? rgb.g : rgb.b);
+
+    hsv.v = rgbMax;
+    if (hsv.v == 0)
+    {
+        hsv.h = 0;
+        hsv.s = 0;
+        return hsv;
+    }
+
+    hsv.s = 255 * (int)(rgbMax - rgbMin) / hsv.v;
+    if (hsv.s == 0)
+    {
+        hsv.h = 0;
+        return hsv;
+    }
+
+    if (rgbMax == rgb.r)
+        hsv.h = 0 + 43 * (rgb.g - rgb.b) / (rgbMax - rgbMin);
+    else if (rgbMax == rgb.g)
+        hsv.h = 85 + 43 * (rgb.b - rgb.r) / (rgbMax - rgbMin);
+    else
+        hsv.h = 171 + 43 * (rgb.r - rgb.g) / (rgbMax - rgbMin);
+
+    return hsv;
 }
