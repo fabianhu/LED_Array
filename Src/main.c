@@ -108,19 +108,34 @@ int main(void)
 
   /* USER CODE BEGIN 3 */
 	  LED_clear();
-	  LED_writeText("Mööp!",0,255,0,0);
 	  LED_start();
-	  HAL_Delay(1000);
 
-	  LED_clear();
+	  HAL_Delay(500);
+	  //LED_writeText("XgXgXgXGXGXGXG",0,255,0,0);
+
+	  LED_setBlk(0,72,20,20,20);
 	  LED_start();
 	  HAL_Delay(500);
-	  //runText("Franz jagt im komplett verwahrlosten Auto Quer durch Bayern.",255,0,0);
-	  char t[] = {'H','a','l','l','o',' ','J',96+31,'r','g','!'};
-	  LED_runText(t,255,0,0);
+	  LED_setBlk(0,72,50,0,0);
+	  LED_start();
 	  HAL_Delay(500);
-	  LED_runText("ich glaub, die Laufschrift ist ganz brauchbar so.",255,0,0);
+	  LED_setBlk(0,72,0,50,0);
+	  LED_start();
 	  HAL_Delay(500);
+	  LED_setBlk(0,72,0,0,50);
+	  LED_start();
+	  HAL_Delay(500);
+
+//
+//	  LED_clear();
+//	  LED_start();
+//	  HAL_Delay(500);
+//	  LED_runText("Franz jagt im komplett verwahrlosten Auto Quer durch Bayern.",255,0,0);
+//	  char t[] = {'H','a','l','l','o',' ','J',96+31,'r','g','!'};
+//	  LED_runText(t,255,0,0);
+//	  HAL_Delay(500);
+//	  LED_runText("ich glaub, die Laufschrift ist ganz brauchbar so.",255,0,0);
+//	  HAL_Delay(500);
 //	  clearArr();
 //	  writeText("Joerg",0,0,255);
 //	  if(do_it) visHandle();

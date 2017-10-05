@@ -84,8 +84,8 @@ static void TIM2_init(void)
 	// This computation of pulse length should work ok,
 	// at some slower core speeds it needs some tuning.
 	tim_period =  SystemCoreClock / 800000; // 0,125us period (10 times lower the 1,25us period to have fixed math below)
-	uint32_t cc1 = (10 * tim_period) / 36;
-	uint32_t cc2 = (10 * tim_period) / 15;
+	uint32_t cc1 = (10 * tim_period) / 40; // 36
+	uint32_t cc2 = (10 * tim_period) / 13; // 15
 
 	Tim2Handle.Instance = TIM2;
 

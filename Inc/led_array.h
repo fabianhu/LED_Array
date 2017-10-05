@@ -14,6 +14,7 @@ int LED_writeText(char* text, int x, uint8_t r, uint8_t g, uint8_t b);
 void LED_runText(char* text, uint8_t r, uint8_t g, uint8_t b);
 void LED_start(void);
 void LED_fill(uint8_t r, uint8_t g, uint8_t b);
+void LED_setBlk(int x, int l, uint8_t r, uint8_t g, uint8_t b);
 void LED_Init(void);
 void LED_clear(void);
 

@@ -111,6 +111,16 @@ void LED_setPixel(int x, int y, uint8_t r, uint8_t g, uint8_t b)
 	if( x < 0 || x > WS2812B_NUMBER_OF_LEDS-1) return;
 	if( y < 0 || y > 7) return;
 
+	frameBuffer[y][x*3]   = r;
+	frameBuffer[y][x*3+1] = g;
+	frameBuffer[y][x*3+2] = b;
+}
+
+void LED_setRainbowPixel(int x, int y, uint8_t r, uint8_t g, uint8_t b)
+{
+	if( x < 0 || x > WS2812B_NUMBER_OF_LEDS-1) return;
+	if( y < 0 || y > 7) return;
+
 	HsvColor hsv;
 	RgbColor rgb;
 

@@ -23,7 +23,7 @@
 // LED output pins
 #define WS2812B_PINS (GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3 | GPIO_PIN_4 | GPIO_PIN_5 | GPIO_PIN_6 | GPIO_PIN_7)
 // How many LEDs are in the series
-#define WS2812B_NUMBER_OF_LEDS 32 //72 fixme
+#define WS2812B_NUMBER_OF_LEDS 72
 
 #define GAMMA true
 
