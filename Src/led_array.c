@@ -37,86 +37,90 @@ uint8_t bk_b = 0;
 
 // define array of Pixel-Data
 // RGB Frame buffers 8 buffers for 8 lines with 72 LEDs each.
-uint8_t frameBuffer[8][3*WS2812B_NUMBER_OF_LEDS];
+
+framebuf_t frameBuffer;
+
+void LED_writeText(char* text, uint8_t r, uint8_t g, uint8_t b)
+{
+
+	LED_writeText_int(frameBuffer,text,0,r,g,b);
+}
+
 
 // return pixel length
-int LED_writeText(char* text, int x, uint8_t r, uint8_t g, uint8_t b)
+int LED_writeText_int(framebuf_t buffer, char* text, int x, uint8_t r, uint8_t g, uint8_t b)
 {
+	int z=x;
 	char* ptr = text;
 	do
 	{
-		x += LED_writeChar(*ptr, x, r, g, b);
-
+		z += LED_writeChar(buffer,*ptr, z, r, g, b);
 		ptr++;
 	}
 	while( *ptr !=0);
-	return x;
+	return z;
 }
 
 void LED_runText(char* text, uint8_t r, uint8_t g, uint8_t b)
 {
-	int pxlen= LED_writeText(text,0,r,g,b); // just get pixel length of text
+	int pxlen= LED_writeText_int(NULL,text,0,0,0,0); // just get pixel length of text
 	LED_fill(0,0,0); // erase again !
 
 	for (int i = WS2812B_NUMBER_OF_LEDS; i>-pxlen;i-- )
 	{
-		LED_writeText(text,i,r,g,b);
+		LED_clear();
+		LED_writeText_int(frameBuffer,text,i,r,g,b);
 		LED_start();
-		HAL_Delay(60);
+		HAL_Delay(1000/60);
 	}
 }
 
 // return x position
-int LED_writeChar(char c, int x, uint8_t r, uint8_t g, uint8_t b)
+int LED_writeChar(framebuf_t buffer, char c, int x, uint8_t r, uint8_t g, uint8_t b)
 {
-
-
 	int idx = c-FONTOFFSET;
 
 	if (idx < 0)
-		return x;
-	int n = 0;
-	for (int i = 0; i < FONTWIDTH; i++)
+		return 0; // fixme
+
+	int i = 0;
+	for (i = 0; i < FONTWIDTH; i++)
 	{
-		uint8_t xi = x+i;
+
 		uint8_t col = font[idx][i];
 
-		if( col != 0)
-		{
-			//n ++; // increment n for every used column to determine width of letter
-			n = i+1; // increment n for every used column to determine width of letter
-		}
+		if(col == 0) break;
+
 		for (int j = 0; j < 8; j++)
 		{
 			if(col & (0x01 << j)) // down is left
-				//setPixel(x+i,j,r,g,b);
-				LED_setPixel(xi,7-j,r,g,b); // upside down
+				LED_setPixel(buffer, x+i,7-j,r,g,b); // upside down
 			else
-				LED_setPixel(xi,7-j,bk_r,bk_g,bk_b); // upside down
+				LED_setPixel(buffer, x+i,7-j,bk_r,bk_g,bk_b); // upside down
 		}
+
 	}
 	for (int j = 0; j < 8; j++) // tailing space
 	{
-			LED_setPixel(x+n,7-j,bk_r,bk_g,bk_b);
+			LED_setPixel(buffer, x+i,7-j,bk_r,bk_g,bk_b);
 	}
-	//visHandle();
-	//HAL_Delay(5);
-	return n+1;
+	return i+1;
 }
 
 
 
-void LED_setPixel(int x, int y, uint8_t r, uint8_t g, uint8_t b)
+void LED_setPixel(framebuf_t buffer, int x, int y, uint8_t r, uint8_t g, uint8_t b)
 {
+	if(buffer == NULL) return;
 	if( x < 0 || x > WS2812B_NUMBER_OF_LEDS-1) return;
 	if( y < 0 || y > 7) return;
 
-	frameBuffer[y][x*3]   = r;
-	frameBuffer[y][x*3+1] = g;
-	frameBuffer[y][x*3+2] = b;
+	buffer[y][x*3]   = r;
+	buffer[y][x*3+1] = g;
+	buffer[y][x*3+2] = b;
 }
 
-void LED_setRainbowPixel(int x, int y, uint8_t r, uint8_t g, uint8_t b)
+void LED_setRainbowPixel(uint8_t *buffer[], int x, int y, uint8_t r, uint8_t g, uint8_t b)
 {
 	if( x < 0 || x > WS2812B_NUMBER_OF_LEDS-1) return;
 	if( y < 0 || y > 7) return;
@@ -133,13 +137,13 @@ void LED_setRainbowPixel(int x, int y, uint8_t r, uint8_t g, uint8_t b)
 	rgb = HsvToRgb(hsv);
 
 	r= rgb.r;
-	g=rgb.g;
-	b=rgb.b;
+	g= rgb.g;
+	b= rgb.b;
 
 
-	frameBuffer[y][x*3]   = r;
-	frameBuffer[y][x*3+1] = g;
-	frameBuffer[y][x*3+2] = b;
+	buffer[y][x*3]   = r;
+	buffer[y][x*3+1] = g;
+	buffer[y][x*3+2] = b;
 }
 
 void LED_fill(uint8_t r, uint8_t g, uint8_t b)
@@ -159,16 +163,16 @@ void LED_clear(void)
 }
 
 
-void LED_setBlk(int x, int l, uint8_t r, uint8_t g, uint8_t b)
-{
-	for (int i=x; i < (x+l); i++)
-	{
-		for (int y=0; y < 8; y++)
-			{
-				LED_setPixel(i,y,r,g,b);
-			}
-	}
-}
+//void LED_setBlk(int x, int l, uint8_t r, uint8_t g, uint8_t b)
+//{
+//	for (int i=x; i < (x+l); i++)
+//	{
+//		for (int y=0; y < 8; y++)
+//			{
+//				LED_setPixel(i,y,r,g,b);
+//			}
+//	}
+//}
 
 
 

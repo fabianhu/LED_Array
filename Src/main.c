@@ -40,7 +40,7 @@
 #include "gpio.h"
 
 /* USER CODE BEGIN Includes */
-
+#include "ws2812b/ws2812b.h"
 #include "led_array.h"
 
 /* USER CODE END Includes */
@@ -110,34 +110,45 @@ int main(void)
 	  LED_clear();
 	  LED_start();
 
-	  HAL_Delay(500);
+	  HAL_Delay(100);
 	  //LED_writeText("XgXgXgXGXGXGXG",0,255,0,0);
 
-	  LED_setBlk(0,72,20,20,20);
-	  LED_start();
-	  HAL_Delay(500);
-	  LED_setBlk(0,72,50,0,0);
-	  LED_start();
-	  HAL_Delay(500);
-	  LED_setBlk(0,72,0,50,0);
-	  LED_start();
-	  HAL_Delay(500);
-	  LED_setBlk(0,72,0,0,50);
-	  LED_start();
-	  HAL_Delay(500);
+//	  LED_setBlk(0,72,20,20,20);
+//	  LED_start();
+//	  HAL_Delay(500);
+//	  LED_setBlk(0,72,50,0,0);
+//	  LED_start();
+//	  HAL_Delay(500);
+//	  LED_setBlk(0,72,0,50,0);
+//	  LED_start();
+//	  HAL_Delay(500);
+//	  LED_setBlk(0,72,0,0,50);
+//	  LED_start();
+//	  HAL_Delay(500);
 
 //
 //	  LED_clear();
 //	  LED_start();
+
+
 //	  HAL_Delay(500);
-//	  LED_runText("Franz jagt im komplett verwahrlosten Auto Quer durch Bayern.",255,0,0);
+	  LED_runText("Franz jagt im komplett verwahrlosten Auto Quer durch Bayern.1einself",128,0,50);
 //	  char t[] = {'H','a','l','l','o',' ','J',96+31,'r','g','!'};
 //	  LED_runText(t,255,0,0);
-//	  HAL_Delay(500);
-//	  LED_runText("ich glaub, die Laufschrift ist ganz brauchbar so.",255,0,0);
-//	  HAL_Delay(500);
+//	  LED_writeChar('T',72-7,255,0,0);
+	  HAL_Delay(2000);
+//
+//	  LED_writeChar('T',72-14,0,255,0);
+//	  HAL_Delay(1000);
+//
+//	  LED_writeChar('T',72-21,0,0,255);
+//	  HAL_Delay(3000);
+
+	  LED_writeText("Franz jagt im komplett verwahrlosten Auto Quer durch Bayern.1einself",128,0,50);
+	  LED_start();
+	  HAL_Delay(3000);
 //	  clearArr();
-//	  writeText("Joerg",0,0,255);
+	  //LED_writeText("ABCDEFG",0,0,0,255);
 //	  if(do_it) visHandle();
 //	  HAL_Delay(500);
 //
