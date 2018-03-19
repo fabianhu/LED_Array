@@ -1,7 +1,7 @@
 [PreviousGenFiles]
-HeaderPath=/home/fabian/workspaces/workspace/LED_Array/LED_Array/Inc
+HeaderPath=/home/fabian/workspaces/workspace/LED_Array/Inc
 HeaderFiles=gpio.h;usart.h;usb.h;stm32f1xx_it.h;stm32f1xx_hal_conf.h;main.h;tim.h;dma.h;usb_device.h;usbd_conf.h;usbd_desc.h;usbd_cdc_if.h;rtc.h;
-SourcePath=/home/fabian/workspaces/workspace/LED_Array/LED_Array/Src
+SourcePath=/home/fabian/workspaces/workspace/LED_Array/Src
 SourceFiles=gpio.h;usart.h;usb.h;stm32f1xx_it.h;stm32f1xx_hal_conf.h;main.h;gpio.c;usart.c;usb.c;stm32f1xx_it.c;stm32f1xx_hal_msp.c;main.c;tim.h;tim.c;dma.h;dma.c;usb_device.h;usbd_conf.h;usbd_desc.h;usbd_cdc_if.h;usb_device.c;usbd_conf.c;usbd_desc.c;usbd_cdc_if.c;rtc.h;rtc.c;
 
 [PreviousLibFiles]

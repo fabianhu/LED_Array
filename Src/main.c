@@ -4,7 +4,7 @@
   * Description        : Main program body
   ******************************************************************************
   *
-  * COPYRIGHT(c) 2017 STMicroelectronics
+  * COPYRIGHT(c) 2018 STMicroelectronics
   *
   * Redistribution and use in source and binary forms, with or without modification,
   * are permitted provided that the following conditions are met:
@@ -64,14 +64,38 @@ void Error_Handler(void);
 
 /* USER CODE BEGIN 0 */
 
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+	if(huart->RxXferSize > 5)
+	{
+		//
+
+	}
+}
+
+extern volatile int lastRXtck;
+
+volatile int tck=0;
+
+void HAL_SYSTICK_Callback(void)
+{
+	tck++;
+}
 
 
 /* USER CODE END 0 */
+
 
 int main(void)
 {
 
   /* USER CODE BEGIN 1 */
+
+	uint8_t rxbuffer[1000] = {0};
+
+	  uint8_t Nachricht[] = {"BlaBlubb"};
+
+
 
   /* USER CODE END 1 */
 
@@ -96,6 +120,8 @@ int main(void)
 
   LED_fill(0,0,0);
   //setPixel(0,0,30,30,30);
+
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -130,6 +156,17 @@ int main(void)
 //	  LED_clear();
 //	  LED_start();
 
+	  //HAL_UART_Receive_IT(&huart1,rxbuffer,5);
+
+
+
+	  HAL_UART_Transmit_IT(&huart1, Nachricht, sizeof(Nachricht)); //Überträgt eine Nachricht per USART
+	  HAL_UART_Receive_IT(&huart1, rxbuffer, 100); //Empfängt eine Nachricht per USART
+	  if (tck-lastRXtck < 100) // ist was gekommen
+	  {
+		  //machen
+
+	  }
 
 //	  HAL_Delay(500);
 	  LED_runText("Franz jagt im komplett verwahrlosten Auto Quer durch Bayern.1einself",128,0,50);

@@ -4,7 +4,7 @@
   * @brief   Interrupt Service Routines.
   ******************************************************************************
   *
-  * COPYRIGHT(c) 2017 STMicroelectronics
+  * COPYRIGHT(c) 2018 STMicroelectronics
   *
   * Redistribution and use in source and binary forms, with or without modification,
   * are permitted provided that the following conditions are met:
@@ -35,7 +35,15 @@
 #include "stm32f1xx.h"
 #include "stm32f1xx_it.h"
 
+
+
 /* USER CODE BEGIN 0 */
+//#include "stm32f1xx_hal_uart.h"
+#include "stm32f1xx_hal.h"
+
+extern volatile int tck;
+volatile int lastRXtck;
+
 
 /* USER CODE END 0 */
 
@@ -250,7 +258,15 @@ void TIM1_CC_IRQHandler(void)
 void USART1_IRQHandler(void)
 {
   /* USER CODE BEGIN USART1_IRQn 0 */
-
+	uint32_t tmp_flag = 0, tmp_it_source = 0;
+	tmp_flag = __HAL_UART_GET_FLAG(&huart1, UART_FLAG_RXNE);
+	tmp_it_source = __HAL_UART_GET_IT_SOURCE(&huart1, UART_IT_RXNE);
+	/* UART in mode Receiver ---------------------------------------------------*/
+	if((tmp_flag != RESET) && (tmp_it_source != RESET))
+	{
+		// was RX; remember
+		lastRXtck = tck;
+	}
   /* USER CODE END USART1_IRQn 0 */
   HAL_UART_IRQHandler(&huart1);
   /* USER CODE BEGIN USART1_IRQn 1 */
