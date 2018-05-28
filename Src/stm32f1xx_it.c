@@ -41,8 +41,9 @@
 //#include "stm32f1xx_hal_uart.h"
 #include "stm32f1xx_hal.h"
 
-extern volatile int tck;
-volatile int lastRXtck;
+extern volatile uint32_t tck;
+volatile uint32_t lastRXtck;
+volatile uint32_t rxCnt;
 
 
 /* USER CODE END 0 */
@@ -264,8 +265,8 @@ void USART1_IRQHandler(void)
 	/* UART in mode Receiver ---------------------------------------------------*/
 	if((tmp_flag != RESET) && (tmp_it_source != RESET))
 	{
-		// was RX; remember
 		lastRXtck = tck;
+		rxCnt++;
 	}
   /* USER CODE END USART1_IRQn 0 */
   HAL_UART_IRQHandler(&huart1);

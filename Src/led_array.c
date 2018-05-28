@@ -71,7 +71,8 @@ void LED_runText(char* text, uint8_t r, uint8_t g, uint8_t b)
 		LED_clear();
 		LED_writeText_int(frameBuffer,text,i,r,g,b);
 		LED_start();
-		HAL_Delay(1000/60);
+		//HAL_Delay(1000/60); // max speed
+		HAL_Delay(1000/40);
 	}
 }
 
@@ -94,7 +95,7 @@ int LED_writeChar(framebuf_t buffer, char c, int x, uint8_t r, uint8_t g, uint8_
 		for (int j = 0; j < 8; j++)
 		{
 			if(col & (0x01 << j)) // down is left
-				LED_setPixel(buffer, x+i,7-j,r,g,b); // upside down
+				LED_setRainbowPixel(buffer, x+i,7-j,r,g,b); // upside down
 			else
 				LED_setPixel(buffer, x+i,7-j,bk_r,bk_g,bk_b); // upside down
 		}
@@ -120,8 +121,9 @@ void LED_setPixel(framebuf_t buffer, int x, int y, uint8_t r, uint8_t g, uint8_t
 	buffer[y][x*3+2] = b;
 }
 
-void LED_setRainbowPixel(uint8_t *buffer[], int x, int y, uint8_t r, uint8_t g, uint8_t b)
+void LED_setRainbowPixel(framebuf_t buffer, int x, int y, uint8_t r, uint8_t g, uint8_t b)
 {
+	if(buffer == NULL) return;
 	if( x < 0 || x > WS2812B_NUMBER_OF_LEDS-1) return;
 	if( y < 0 || y > 7) return;
 
@@ -140,10 +142,10 @@ void LED_setRainbowPixel(uint8_t *buffer[], int x, int y, uint8_t r, uint8_t g, 
 	g= rgb.g;
 	b= rgb.b;
 
-
 	buffer[y][x*3]   = r;
 	buffer[y][x*3+1] = g;
 	buffer[y][x*3+2] = b;
+
 }
 
 void LED_fill(uint8_t r, uint8_t g, uint8_t b)

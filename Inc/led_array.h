@@ -11,6 +11,7 @@
 typedef uint8_t framebuf_t [8][3*WS2812B_NUMBER_OF_LEDS];
 
 void LED_setPixel(framebuf_t buffer, int x, int y, uint8_t r, uint8_t g, uint8_t b);
+void LED_setRainbowPixel(framebuf_t buffer, int x, int y, uint8_t r, uint8_t g, uint8_t b);
 int LED_writeChar(framebuf_t buffer, char c, int x, uint8_t r, uint8_t g, uint8_t b);
 int LED_writeText_int(framebuf_t buffer, char* text, int x, uint8_t r, uint8_t g, uint8_t b);
 void LED_writeText(char* text, uint8_t r, uint8_t g, uint8_t b);

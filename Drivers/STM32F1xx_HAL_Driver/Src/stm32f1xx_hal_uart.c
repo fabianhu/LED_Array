@@ -880,8 +880,8 @@ HAL_StatusTypeDef HAL_UART_Receive_IT(UART_HandleTypeDef *huart, uint8_t *pData,
   uint32_t tmp_state = 0;
   
   tmp_state = huart->State;
-  if((tmp_state == HAL_UART_STATE_READY) || (tmp_state == HAL_UART_STATE_BUSY_TX))
-  {
+//  if((tmp_state == HAL_UART_STATE_READY) || (tmp_state == HAL_UART_STATE_BUSY_TX))
+//  {
     if((pData == NULL ) || (Size == 0))
     {
       return HAL_ERROR;
@@ -918,11 +918,11 @@ HAL_StatusTypeDef HAL_UART_Receive_IT(UART_HandleTypeDef *huart, uint8_t *pData,
     __HAL_UART_ENABLE_IT(huart, UART_IT_RXNE);
 
     return HAL_OK;
-  }
-  else
-  {
-    return HAL_BUSY;
-  }
+//  }
+//  else
+//  {
+//    return HAL_BUSY;
+//  }
 }
 
 /**

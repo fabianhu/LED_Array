@@ -64,18 +64,10 @@ void Error_Handler(void);
 
 /* USER CODE BEGIN 0 */
 
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
-{
-	if(huart->RxXferSize > 5)
-	{
-		//
-
-	}
-}
-
 extern volatile int lastRXtck;
+extern volatile uint32_t rxCnt;
 
-volatile int tck=0;
+volatile uint32_t tck=0;
 
 void HAL_SYSTICK_Callback(void)
 {
@@ -92,10 +84,6 @@ int main(void)
   /* USER CODE BEGIN 1 */
 
 	uint8_t rxbuffer[1000] = {0};
-
-	  uint8_t Nachricht[] = {"BlaBlubb"};
-
-
 
   /* USER CODE END 1 */
 
@@ -121,6 +109,7 @@ int main(void)
   LED_fill(0,0,0);
   //setPixel(0,0,30,30,30);
 
+  HAL_UART_Receive_IT(&huart1, rxbuffer, 100); //Empfängt eine Nachricht per USART
 
   /* USER CODE END 2 */
 
@@ -158,22 +147,31 @@ int main(void)
 
 	  //HAL_UART_Receive_IT(&huart1,rxbuffer,5);
 
+	  uint8_t tempbuf[100];
 
-
-	  HAL_UART_Transmit_IT(&huart1, Nachricht, sizeof(Nachricht)); //Überträgt eine Nachricht per USART
-	  HAL_UART_Receive_IT(&huart1, rxbuffer, 100); //Empfängt eine Nachricht per USART
-	  if (tck-lastRXtck < 100) // ist was gekommen
+	  if (tck-lastRXtck > 1000 && rxCnt > 0) // ist was gekommen
 	  {
 		  //machen
+		  int i=0;
+		  for(;i<rxCnt;i++)
+		  {
+			  tempbuf[i] = rxbuffer[i];
+		  }
+		  rxCnt = 0;
+		  tempbuf[i]=0;
+		  HAL_UART_Transmit(&huart1, tempbuf, i,0xffff); //Überträgt eine Nachricht per USART
 
+		  HAL_UART_Receive_IT(&huart1, rxbuffer, 100); //Empfängt eine Nachricht per USART
 	  }
 
+	  LED_runText(tempbuf,128,0,50);
+
 //	  HAL_Delay(500);
-	  LED_runText("Franz jagt im komplett verwahrlosten Auto Quer durch Bayern.1einself",128,0,50);
+	  //LED_runText("Franz jagt im komplett verwahrlosten Auto Quer durch Bayern.1einself",128,0,50);
 //	  char t[] = {'H','a','l','l','o',' ','J',96+31,'r','g','!'};
 //	  LED_runText(t,255,0,0);
 //	  LED_writeChar('T',72-7,255,0,0);
-	  HAL_Delay(2000);
+	  //HAL_Delay(2000);
 //
 //	  LED_writeChar('T',72-14,0,255,0);
 //	  HAL_Delay(1000);
@@ -181,9 +179,9 @@ int main(void)
 //	  LED_writeChar('T',72-21,0,0,255);
 //	  HAL_Delay(3000);
 
-	  LED_writeText("Franz jagt im komplett verwahrlosten Auto Quer durch Bayern.1einself",128,0,50);
-	  LED_start();
-	  HAL_Delay(3000);
+	  //LED_writeText("Franz jagt im komplett verwahrlosten Auto Quer durch Bayern.1einself",128,0,50);
+	  //LED_start();
+	  //HAL_Delay(3000);
 //	  clearArr();
 	  //LED_writeText("ABCDEFG",0,0,0,255);
 //	  if(do_it) visHandle();
